@@ -17,7 +17,8 @@ const AdminDashboard = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [filter, setFilter] = useState("");
     const [packages, setPackages] = useState([]);
-    const accessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNjg0MjYxOTM2LCJleHAiOjE2ODQzMzM5MzZ9.90L6oDjSC4Z0K5kBbsIAf4xgprIll0pEt9lGMkiBGzQ';
+    const [accessToken, setAccessToken] = useState(localStorage.getItem("accessToken"))
+   
     
     const fetchPackages = async () => {
       try {
@@ -39,6 +40,7 @@ const AdminDashboard = () => {
     };
     
     useEffect(() => {
+   
       fetchPackages();
     }, [category, searchTerm, filter]);
     
@@ -60,9 +62,11 @@ const AdminDashboard = () => {
         "Collected",
       ];
     
-    console.log(category, searchTerm);
+  
 
     const navigate = useNavigate()
+
+
 
   return (
     <section className="p">
@@ -285,7 +289,7 @@ const AdminDashboard = () => {
         </tr>
       </thead>
       <tbody className="bg-white divide-y divide-gray-200">
-        {packages.map((pkg) => (
+        {packages?.map((pkg) => (
           <tr key={pkg.id}>
             <td className="px-6 py-4 whitespace-nowrap">
               <div className="text-sm text-gray-900">{pkg.member_no}</div>

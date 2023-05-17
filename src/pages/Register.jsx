@@ -32,16 +32,16 @@ const pickupLocations = [
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    telephone: "",
-    address: "",
-    city: "",
-    parish: "",
-    pickup_location: "",
-    password: "",
-    userName: "",
+    "firstName": "Ric",
+    "lastName": "Mert",
+    "telephone": "+1 (876) 456-7890",
+    "city": "Kingston",
+    "parish": "St. Andrew",
+    "address": "123 Main St.",
+    "pickup_location": "456 Elm St.",
+    "userName": "pete",
+    "email":"pete@gmail.com",
+    "password": "ricky$123"
    
   });
 
@@ -90,7 +90,6 @@ const Register = () => {
         pickup_location: "",
         userName: "",
         password: "",
-        confirmPassword: "",
       });
 
       console.log(response.data.token);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { NavLink } from "react-router-dom";
 
@@ -8,7 +8,7 @@ export const Navbar = () => {
   const [userInfo, setUserInfo] = useState([]);
 
   const getUser = async () => {
-    const isValid = localStorage.getItem("token");
+    const isValid = localStorage.getItem("accessToken");
 
     if (isValid) {
       console.log(isValid);
@@ -17,11 +17,40 @@ export const Navbar = () => {
     }
   };
 
+  const [showPopover, setShowPopover] = useState(false);
+
+  const popoverRef = useRef(null);
+
+  const handleLogout = () => {
+    // Implement your logout logic here
+    console.log("Logout");
+    // Close the popover after logout
+    setShowPopover(false);
+  };
+
+  const handleClickOutside = (event) => {
+    if (popoverRef.current && !popoverRef.current.contains(event.target)) {
+      localStorage.removeItem("accessToken")
+      localStorage.removeItem("userInfo")
+      setShowPopover(false);
+      window.location.reload()
+    }
+  };
+
+
+  
   useEffect(() => {
     getUser();
   }, []);
 
-  console.log(userInfo);
+  useEffect(() => {
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
 
   return (
     <section className="px-16 flex justify-between primary-color h-16 w-screen items-center">
@@ -48,11 +77,27 @@ export const Navbar = () => {
         {/* registraion */}
 
         {isLoggedIn ? (
-          <div class="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
-            <span class="font-bold text-gray-600 capitalize dark:text-gray-300">
-              {userInfo?.first_name?.slice(0, 1)}
-            </span>
-          </div>
+         <div className="relative" ref={popoverRef}>
+         <div
+           className="cursor-pointer inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600"
+           onClick={() => setShowPopover(!showPopover)}
+         >
+           <span className="font-bold text-gray-600 capitalize dark:text-gray-300">
+             {userInfo?.firstName?.slice(0, 1)}
+           </span>
+         </div>
+
+         {showPopover && (
+           <div className="absolute border-b-2 border-blue-400 bg-white rounded-md shadow-md p-2 right-0 mt-2">
+             <button
+               className="text-red-500 bg-green-300 hover:text-red-700 cursor-pointer"
+               onClick={handleLogout}
+             >
+               Logout
+             </button>
+           </div>
+         )}
+       </div>
         ) : (
           <div className="flex  space-x-5 items-center">
             <NavLink to="/login">

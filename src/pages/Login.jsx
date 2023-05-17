@@ -19,19 +19,29 @@ function Login() {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/login", {
-        email: userName,
+      const response = await axios.post("http://localhost:3001/api/v1/auth/login", {
+        userName: userName,
         password,
       });
 
       if (response.status === 200) {
-        toast("Logged In");
-        const { token, userInfo } = response.data;
+       
+        const { token, user } = response.data;
 
-        localStorage.setItem("token", token);
-        localStorage.setItem("userInfo", JSON.stringify(userInfo));
-        console.log(token, userInfo);
-        navigate("/");
+        localStorage.setItem("accessToken", token);
+         localStorage.setItem("userInfo", JSON.stringify(user));
+        
+
+        console.log(user.isAdmin)
+
+        if(user.isAdmin){
+          navigate("/admin");
+        }else{
+        navigate("/user")
+        }
+
+        toast("Logged In");
+       
       } else {
         throw new Error("Failed to log in.");
       }
