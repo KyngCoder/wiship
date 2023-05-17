@@ -1,0 +1,137 @@
+.primary-color{
+  background-color: #263ba9;
+}
+
+.color-one{
+  background-color: #ffd075;
+}
+
+.color-two{
+  background-color: #abfd96;
+}
+
+.container{
+  padding: 0 16px;
+}
+
+.column{
+  display: flex;
+  flex-direction: column;
+}
+
+.centre{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.plane__img{
+
+  transform: skewY(-10deg) ;
+  max-width: 900px;
+  margin-left: -100px;
+  position:absolute;
+  top: -60px;
+
+}
+
+
+
+
+
+.box {
+  border: 6px double #abfd96;
+  position: relative;
+  width: 580px;
+  height: 450px;
+}
+
+.circle {
+  position: absolute;
+  top: -110px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 257px;
+  height: 190px;
+  background-image: url('https://agapecourier.com/wp-content/uploads/2018/11/agape-international-feature-plane.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 50%;
+
+  z-index: 50;
+}
+
+.circle2{
+  position: absolute;
+  top: -110px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 244px;
+  height: 200px;
+  background-image: url('https://agapecourier.com/wp-content/uploads/2018/11/agape-international-feature-ship.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 50%;
+
+  z-index: 50;
+}
+
+.card {
+  border: 2px solid #263ba9;
+  position: relative;
+  width: 580px;
+  height: 300px;
+}
+.testi{
+  position: absolute;
+  top: -110px;
+  left: 50%;
+  transform: translateX(-48%);
+  width: 200px;
+  height: 200px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 50%;
+  z-index: 1000000;
+}
+
+
+
+
+
+
+
+
+
+.form-container{
+  padding: 40px;
+}
+
+hr{
+  width: 40%;
+  margin: 10px 0px 20px 0px;
+}
+
+input{
+  width: 40%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid grey;
+  margin-top: 8px;
+  margin-bottom: 20px;
+}
+
+#btnAddPackage{
+  padding: 10px 30px;
+  border: none;
+  background-color: #263BA9;
+  color: #ffffff;
+  border-radius: 5px;
+}
+
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
