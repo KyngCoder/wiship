@@ -9,6 +9,9 @@ import Rates from "./pages/Rates";
 import UserDashboard from "./pages/UserDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import CreatePackage from "./pages/CreatePackage";
+import MemberTable from "./pages/MemberTable";
+import UserProfile from "./pages/UpdateProfile";
+import UpdateProfile from "./pages/UpdateProfile";
 
 
 function App() {
@@ -30,6 +33,8 @@ function App() {
 
           <Route path="/user" element={<UserDashboard />} />
           <Route path="/addPackage" element={<CreatePackage />} />
+          <Route path="/members" element={<MemberTable />} />
+          <Route path="/profile" element={<UpdateProfile />} />
         </Routes>
         <Footer />
       </BrowserRouter>

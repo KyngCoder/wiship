@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import wiship from "../assets/images/wiship.png";
 
 import { AiFillHome } from "react-icons/ai";
-import {GoKebabVertical} from 'react-icons/go'
+
 import { MdDashboard } from "react-icons/md";
 import {FaUsers} from 'react-icons/fa'
 import { TbTruckDelivery, TbPackages } from "react-icons/tb";
@@ -10,48 +10,81 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { BsFillArrowRightCircleFill } from "react-icons/bs";
 import DropdownFilter from "../components/DropdownFilter";
 import axios from "axios";
+import Table from "../components/Table";
 
 const AdminDashboard = () => {
 
-    const [category, setCategory] = useState("member_no");
-    const [searchTerm, setSearchTerm] = useState("");
-    const [filter, setFilter] = useState("");
-    const [packages, setPackages] = useState([]);
-    const [accessToken, setAccessToken] = useState(localStorage.getItem("accessToken"))
+  const [allPackages, setAllPackages] = useState(true)
+
+  const [category, setCategory] = useState("member_no");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filter, setFilter] = useState("");
+  const [packages, setPackages] = useState([]);
+  const [accessToken, setAccessToken] = useState(localStorage.getItem("accessToken"));
+
+  const [pageNum, setPageNum] = useState(1);
+  const [previousCount, setPreviousCount] = useState(1);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isNextDisabled, setIsNextDisabled] = useState(false);
+  const [isPreviousDisabled, setIsPreviousDisabled] = useState(true);
+
+  const itemsPerPage = 5; // Number of items to display per page
+
+  const fetchPackages = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3001/api/v1/package`, {
+        headers: {
+          accessToken: accessToken,
+        },
+        params: {
+          category: category,
+          search: searchTerm,
+          status: filter,
+        },
+      });
+      const packages = response.data;
+      setPackages(packages);
+    } catch (error) {
+      console.error("Error fetching packages:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchPackages();
+  }, [category, searchTerm, filter, pageNum]);
+
+  const handleFilterChange = (selectedOption) => {
+    setFilter(selectedOption);
+  };
+
+  const handlePreviousClick = () => {
+    if (pageNum > 1) {
+      setPageNum((prevPageNum) => prevPageNum - 1);
+    }
+  };
+
+  const handleNextClick = () => {
+    setPageNum((prevPageNum) => prevPageNum + 1);
+  };
+
+  useEffect(() => {
+    const updatePagination = () => {
+      setIsPreviousDisabled(pageNum === 1);
+      setIsNextDisabled(packages.length < itemsPerPage);
+      setPreviousCount(pageNum);
+    };
+
+    updatePagination();
+  }, [pageNum, packages]);
+
+  // Calculate the index of the first and last item to display
+  const firstItemIndex = (pageNum - 1) * itemsPerPage;
+  const lastItemIndex = firstItemIndex + itemsPerPage;
+
+  // Slice the packages array based on the current page and items per page
+  const displayedPackages = packages.slice(firstItemIndex, lastItemIndex);
+
    
-    
-    const fetchPackages = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3001/api/v1/package`, {
-          headers: {
-            accessToken: accessToken,
-          },
-          params: {
-            category: category,
-            search: searchTerm,
-            status: filter,
-          },
-        });
-        const packages = response.data;
-        setPackages(packages);
-      } catch (error) {
-        console.error('Error fetching packages:', error);
-      }
-    };
-    
-    useEffect(() => {
-   
-      fetchPackages();
-    }, [category, searchTerm, filter]);
-    
-    const handleFilterChange = (selectedOption) => {
-      setFilter(selectedOption);
-    };
-    
-    const submit = (event) => {
-      event.preventDefault();
-      fetchPackages();
-    };
 
     const options = [
         "All",
@@ -62,11 +95,14 @@ const AdminDashboard = () => {
         "Collected",
       ];
     
-  
+      const submit = (event) => {
+        event.preventDefault();
+        fetchPackages();
+      };
 
     const navigate = useNavigate()
 
-
+console.log(filter)
 
   return (
     <section className="p">
@@ -195,58 +231,58 @@ const AdminDashboard = () => {
           </div>
 
           <form onSubmit={submit}>
-        <div className="relative w-full">
-          <div className="flex">
-            <div className="rounded m-1 w-44 dark:bg-blue-700">
-              <div className="flex p-2  items-center h-full">
-                <select
-                  value={category}
-                  onChange={(event) => setCategory(event.target.value)}
-                  className="cursor-pointer  text-center w-full ring-opacity-0 
-                  bg-blue-600 outline-none text-white px-2 "
-                >
-                  <option className="bg-gray-6200" value="member_no">
-                    Member #
-                  </option>
-                  <option className="bg-gray-600" value="fullName">
-                    Name
-                  </option>
-                  <option className="bg-gray-600" value="airwayBillNo">
-                    Airway #
-                  </option>
-                </select>
-              </div>
-            </div>
-            <input
-              type="search"
-              id="search-dropdown"
-              className="w-full bg-blue-700 mt-1 mb-1 p-2 text-white border-2 border-transparent hover:outline-none focus:outline-none mr-2 rounded-md"
-              placeholder="Search Anime, Character, Random"
-              value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
-            />
-            <button
-              type="submit"
-              className="absolute top-1.5 right-3 p-2.5 text-sm font-medium text-white hover:bg-blue-900 hover:outline-none focus:outline-none"
-            >
-              <svg
-                className="w-5 h-5 "
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
+      <div className="relative w-full">
+        <div className="flex">
+          <div className="rounded m-1 w-44 dark:bg-blue-700">
+            <div className="flex p-2  items-center h-full">
+              <select
+                value={category}
+                onChange={(event) => setCategory(event.target.value)}
+                className="cursor-pointer  text-center w-full ring-opacity-0 
+              bg-blue-600 outline-none text-white px-2 "
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                ></path>
-              </svg>
-            </button>
+                <option className="bg-gray-6200" value="member_no">
+                  Member #
+                </option>
+                <option className="bg-gray-600" value="fullName">
+                  Name
+                </option>
+                <option className="bg-gray-600" value="airwayBillNo">
+                  Airway #
+                </option>
+              </select>
+            </div>
           </div>
+          <input
+            type="search"
+            id="search-dropdown"
+            className="w-full bg-blue-700 mt-1 mb-1 p-2 text-white border-2 border-transparent hover:outline-none focus:outline-none mr-2 rounded-md"
+            placeholder="Search Anime, Character, Random"
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+          />
+          <button
+            type="submit"
+            className="absolute top-1.5 right-3 p-2.5 text-sm font-medium text-white hover:bg-blue-900 hover:outline-none focus:outline-none"
+          >
+            <svg
+              className="w-5 h-5 "
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              ></path>
+            </svg>
+          </button>
         </div>
-      </form>
+      </div>
+    </form>
 
           <div className="mt-8">
            <div className="flex justify-between">
@@ -259,67 +295,38 @@ const AdminDashboard = () => {
        <DropdownFilter options={options} onChange={handleFilterChange} />  
          
       
-    <table className="min-w-full divide-y divide-gray-200">
-      <thead>
-        <tr>
-        <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Member NO.
-          </th>
-          <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Full Name
-          </th>
-          <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Airway Bill No
-          </th>
-          <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Description
-          </th>
-          <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Delivery
-          </th>
-          <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Status
-          </th>
-          <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-          Cost
-          </th>
-          <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Action
-          </th>
-        </tr>
-      </thead>
-      <tbody className="bg-white divide-y divide-gray-200">
-        {packages?.map((pkg) => (
-          <tr key={pkg.id}>
-            <td className="px-6 py-4 whitespace-nowrap">
-              <div className="text-sm text-gray-900">{pkg.member_no}</div>
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap">
-              <div className="text-sm text-gray-900">{pkg.fullName}</div>
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap">
-              <div className="text-sm text-gray-900">{pkg.airwayBillNo}</div>
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap">
-              <div className="text-sm text-gray-900">{pkg.description}</div>
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap">
-              <div className="text-sm text-gray-900">{pkg.deliveryStatus ? 'yes' : 'no'}</div>
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap">
-              <div className="text-sm text-gray-900">{pkg.status}</div>
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap">
-              <div className="text-sm text-gray-900">${pkg.cost}</div>
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap">
-              <div className="text-sm text-gray-900"><GoKebabVertical /></div>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <Table 
+    displayedPackages={displayedPackages}
+     />
  
+    <nav className='mx-16 mb-4'  aria-label="Page navigation example">
+  <ul class="inline-flex items-center space-x-2">
+    <li onClick={handlePreviousClick}>
+      <a href="#" class="block px-3 py-2 leading-tight text-gray-500 bg-white rounded-l-lg  ">
+        <span class="sr-only">Previous</span>
+        <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+      </a>
+    </li>
+    <li onClick={()=>setPageNum(1)}>
+      <a href="#" class="px-3 py-2 leading-tight text-gray-500 bg-white ">{pageNum > 3? pageNum -3 : 1}</a>
+    </li>
+    <li onClick={()=>setPageNum(2)}>
+      <a href="#" class="px-3 py-2 leading-tight text-gray-500 bg-white ">{pageNum > 3? pageNum - 2 : 2}</a>
+    </li>
+    <li onClick={()=>setPageNum(3)}>
+      <a href="#" aria-current="page" class="px-3 py-2 leading-tight text-gray-500 bg-white ">{pageNum > 3? pageNum -1 : 3}</a>
+    </li>
+    
+    <li onClick={handleNextClick} 
+    
+    >
+      <a href="#" class="block px-3 py-2 leading-tight text-gray-500 bg-white rounded-r-lg  ">
+        <span class="sr-only">Next</span>
+        <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+      </a>
+    </li>
+  </ul>
+</nav>
 
          
         </div>
